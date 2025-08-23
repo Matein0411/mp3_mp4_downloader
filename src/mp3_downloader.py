@@ -1,22 +1,19 @@
 import yt_dlp
 import sys
 
-def ask_user_options_mp3():
-	"""
-	Ask the user for download options: URL, start time, end time, audio language.
-	"""
-	start_time = input("Enter start time (hh:mm:ss or seconds, leave blank for start): ").strip()
-	end_time = input("Enter end time (hh:mm:ss or seconds, leave blank for full audio): ").strip()
-	language = input("Enter audio language code (leave blank for default): ").strip()
-	settings = (start_time, end_time, language)
-	return settings
-
 def download_audio(url, settings):
 	"""
 	Download audio from the given URL, optionally trimming and selecting language.
 	"""
+	# Configure yt_dlp options based on user settings
+	start_time, end_time, language = settings
+
+	if language:
+		format_str = f"bestaudio[language={language}]"
+	else:
+		format_str = "bestaudio/best"
 	ydl_opts = {
-		'format': 'bestaudio',
+		'format': format_str,
 		'postprocessors': [{
 			'key': 'FFmpegExtractAudio',
 			'preferredcodec': 'mp3',
@@ -26,15 +23,12 @@ def download_audio(url, settings):
 	}
 
 	post_args = []
-	if settings[0]:
-		post_args += ['-ss', settings[0]]
-	if settings[1]:
-		post_args += ['-to', settings[1]]
+	if start_time:
+		post_args += ['-ss', start_time]
+	if end_time:
+		post_args += ['-to', end_time]
 	if post_args:
 		ydl_opts['postprocessor_args'] = post_args
-
-	if settings[2]:
-		ydl_opts['preferedlanguage'] = settings[2]
 
 	try:
 		with yt_dlp.YoutubeDL(ydl_opts) as ydl:

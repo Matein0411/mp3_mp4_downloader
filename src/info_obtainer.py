@@ -32,7 +32,8 @@ def get_video_info(video_url):
             print(f"Error getting information: {e}", file=sys.stderr)
             return None
 
-def display_summary(info):
+
+def extract_features(info):
     '''
     Show a simple summary with the requested information.
     '''
@@ -40,7 +41,7 @@ def display_summary(info):
     title = info.get('title', 'Not available')
 
     # 2. Video duration (converted to MM:SS format)
-    duration_seconds = info.get('duration', 0)
+    duration_seconds = int(info.get('duration', 0))
     if duration_seconds:
         minutes, seconds = divmod(duration_seconds, 60)
         duration_str = f"{minutes:02d}:{seconds:02d}"
@@ -80,13 +81,13 @@ def display_summary(info):
         languages = ", ".join(subtitles.keys())
     else:
         languages = "Not available"
-
-    # Display the summary
-    print("\n--- Video Summary ---")
-    print(f"Title: {title}")
-    print(f"Duration: {duration_str}")
-    print(f"Video Qualities: {qualities_str}")
-    print(f"Subtitle Languages: {languages}")
-    print(f"Audio Languages: {audio_languages_str}")
+    
+    return {
+        "title": title,
+        "duration": duration_str,
+        "audio_languages": audio_languages_str,
+        "video_qualities": qualities_str,
+        "subtitles_languages": languages
+    }
 
 
